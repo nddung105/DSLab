@@ -114,5 +114,5 @@ def get_tf_idf(data_path):
                            for label, doc_id, sparse_rep in data_tf_idf]))
 if __name__ == '__main__':
     listGroupData()
-    generateVocabulary('datasets/20news-bydate/20news-full-processed.txt')
-    get_tf_idf('datasets/20news-bydate/20news-train-processed.txt')
+    generateVocabulary('./20news-bydate/20news-full-processed.txt')
+    get_tf_idf('./20news-bydate/20news-train-processed.txt')
