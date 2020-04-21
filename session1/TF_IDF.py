@@ -112,3 +112,7 @@ def get_tf_idf(data_path):
     with open('./20news-bydate/data_tf_idf.txt', 'w') as f:
         f.write('\n'.join([str(label) + '<fff>' + str(doc_id) + '<fff>' + sparse_rep
                            for label, doc_id, sparse_rep in data_tf_idf]))
+if __name__ == '__main__':
+    listGroupData()
+    generateVocabulary('./20news-bydate/20news-full-processed.txt')
+    get_tf_idf('./20news-bydate/20news-train-processed.txt')
