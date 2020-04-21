@@ -40,6 +40,7 @@ class RidgeRegression(object):
         ).dot(X_train.T).dot(Y_train)
         return W
 
+        # use graduent descent
     def fit_gradient_descent(self, X_train, Y_train, LAMBDA, learning_rate, max_num_epoch=100, batch_size=128):
         W = np.random.rand(X_train.shape[1])
         last_loss = 10e+8
@@ -64,33 +65,38 @@ class RidgeRegression(object):
 
     def predict(self, W, X_new):
         X_new = np.array(X_new)
-        Y_new = X_new.dot(W)
+        Y_new = X_new.dot(W)  # Y=XW  X(n,m) W(m,1) n: example, m: feature
         return Y_new
 
     def compute_RSS(self, Y_new, Y_predicted):
+        # loss function loss = (1/2n)(sum(y_new-y_predict)^2)
         loss = 1. / Y_new.shape[0] * np.sum((Y_new - Y_predicted)**2)
         return loss
 
     def get_the_best_LAMBDA(self, X_train, Y_train):
         def cross_validation(num_folds, LAMBDA):
-            row_ids = np.array(range(X_train.shape[0]))
+            row_ids = np.array(range(X_train.shape[0]))  # array index example
             valid_ids = np.split(
-                row_ids[:len(row_ids) - len(row_ids) % num_folds], num_folds)
+                row_ids[:len(row_ids) - len(row_ids) % num_folds], num_folds)  # To divide without getting an error, you need to divide all
             valid_ids[-1] = np.append(valid_ids[-1],
-                                      row_ids[len(row_ids) - len(row_ids) % num_folds:])
+                                      row_ids[len(row_ids) - len(row_ids) % num_folds:])  # valid_ids[-1] = valid_ids[-1]+ list form len(row_ids) - len(row_ids) % num_folds to end
             train_ids = [[k for k in row_ids if k not in valid_ids[i]]
-                         for i in range(num_folds)]
+                         for i in range(num_folds)]  # add index to train data
             aver_RSS = 0
-            for i in range(num_folds):
+
+            for i in range(num_folds):  # loop folds
                 valid_part = {'X': X_train[
                     valid_ids[i]], 'Y': Y_train[valid_ids[i]]}
                 train_part = {'X': X_train[
                     train_ids[i]], 'Y': Y_train[train_ids[i]]}
-                W = self.fit(train_part['X'], train_part['Y'], LAMBDA)
-                Y_predicted = self.predict(W, valid_part['X'])
+                W = self.fit(train_part['X'], train_part[
+                             'Y'], LAMBDA)  # caculate Weight
+                Y_predicted = self.predict(W, valid_part['X'])  # predict
+                # sum loss
                 aver_RSS += self.compute_RSS(valid_part['Y'], Y_predicted)
             return aver_RSS / num_folds
 
+        # loop value lambda find min RSS
         def range_scan(best_LAMBDA, minimum_RSS, LAMBDA_values):
             for current_LAMBDA in LAMBDA_values:
                 aver_RSS = cross_validation(num_folds=5, LAMBDA=current_LAMBDA)
@@ -100,14 +106,15 @@ class RidgeRegression(object):
             return best_LAMBDA, minimum_RSS
 
         best_LAMBDA, minimum_RSS = range_scan(
-            best_LAMBDA=0, minimum_RSS=10000 ** 2, LAMBDA_values=range(50))
+            best_LAMBDA=0, minimum_RSS=10000 ** 2, LAMBDA_values=range(50))  # test function range_scan
 
-        LAMBDA_values = [k * 1. / 1000 for k in range(
-            max(0, (best_LAMBDA - 1) * 1000, (best_LAMBDA + 1) * 1000, 1)
+        LAMBDA_values = [k * 1. / 10000 for k in range(
+            max(0, (best_LAMBDA - 1) * 10000,
+                (best_LAMBDA + 1) * 10000, 1)  # range lambda
         )]
 
         best_LAMBDA, minimum_RSS = range_scan(
-            best_LAMBDA, minimum_RSS, LAMBDA_values)
+            best_LAMBDA, minimum_RSS, LAMBDA_values)  # find best lambda
         return best_LAMBDA
 
 if __name__ == "__main__":
