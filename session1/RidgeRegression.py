@@ -40,6 +40,7 @@ class RidgeRegression(object):
         ).dot(X_train.T).dot(Y_train)
         return W
 
+        # use graduent descent
     def fit_gradient_descent(self, X_train, Y_train, LAMBDA, learning_rate, max_num_epoch=100, batch_size=128):
         W = np.random.rand(X_train.shape[1])
         last_loss = 10e+8
