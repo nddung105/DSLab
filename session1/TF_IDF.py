@@ -1,5 +1,8 @@
 import os
 from nltk.stem.porter import PorterStemmer
+import re
+from collections import defaultdict
+import numpy as np
 
 
 def listGroupData():
@@ -20,17 +23,17 @@ def listGroupData():
                      for filename in os.listdir(dirPath) if os.path.isfile(dirPath + filename)]
             files.sort()
             for filename, filePath in files:
-                with open(filePath, "r") as file:
+                with open(filePath, encoding="utf8", errors='ignore') as file:
                     text = file.read().lower()
-                    text = re.sub(r'[_+]', '', text)
-                    words = [stemmer.stem(word)
-                             for word in re.split('\W+', text)
-                             if word not in stop_words]
+                text = re.sub(r'[_+]', '', text)
+                words = [stemmer.stem(word)
+                         for word in re.split('\W+', text)
+                         if word not in stop_words]
 
-                    content = ' '.join(words)
-                    assert len(content.splitlines()) == 1
-                    data.append(str(label) + '<fff>' +
-                                filename + '<fff>' + content)
+                content = ' '.join(words)
+                assert len(content.splitlines()) == 1
+                data.append(str(label) + '<fff>' +
+                            filename + '<fff>' + content)
         return data
 
     trainData = colectDataFrom(parentDir=trainDir, newsgroupList=listGroup)
@@ -113,6 +116,12 @@ def get_tf_idf(data_path):
         f.write('\n'.join([str(label) + '<fff>' + str(doc_id) + '<fff>' + sparse_rep
                            for label, doc_id, sparse_rep in data_tf_idf]))
 if __name__ == '__main__':
-    listGroupData()
-    generateVocabulary('./20news-bydate/20news-full-processed.txt')
-    get_tf_idf('./20news-bydate/20news-train-processed.txt')
+    # listGroupData()
+    # generateVocabulary('./20news-bydate/20news-full-processed.txt')
+    # get_tf_idf('./20news-bydate/20news-train-processed.txt')
+    text = "dung+ nguyen _ "
+    text = re.sub(r'[_+]', '', text)
+    print(text)
+    with open('./20news-bydate/20news-full-processed.txt') as f:
+        lines = f.readlines()
+    print(len(lines))
