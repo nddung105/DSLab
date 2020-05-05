@@ -2,6 +2,7 @@ import os
 import numpy as np
 from collections import defaultdict
 import argparse
+import random
 
 
 class Member():
@@ -20,6 +21,7 @@ class Cluster():
     def __init__(self):
         self.centroid = None  # type is array. is embed_tf_idf of member
         self.members = []  # type is Member. list members of cluster
+        self.label = None
 
 
 class Kmeans():
@@ -59,8 +61,10 @@ class Kmeans():
     def random_init(self, seed_value):
         index = []
         i = 0
+        random.shuffle(self.data)
         for member in self.data:
             if (member.label not in index):
+                self.clusters[i].label = member.label
                 self.clusters[i].centroid = member.embed_tf_idf
                 i += 1
                 index.append(member.label)
@@ -176,7 +180,7 @@ class Kmeans():
         for indexI in range(self.number_clusters):
             size = len(self.clusters[indexI].members)
             for indexJ in range(size):
-                if (self.clusters[indexI].members[indexJ].label == indexI):
+                if (self.clusters[indexI].members[indexJ].label == self.clusters[indexI].label):
                     true += 1
         return true / data_size
 
@@ -184,19 +188,19 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Kmeans Cluster')
     # get path of data file
-    parser.add_argument('path', metavar='--path', type=str, nargs='?',
+    parser.add_argument('--path', type=str, nargs='?',
                         help='the path of data file', default="./data_tf_idf.txt")
     # get vocab size
-    parser.add_argument('vocab_size', metavar='--vocab_size',
+    parser.add_argument('--vocab_size',
                         type=int, help='size of vocab', default=14140, nargs='?')
     # get number of cluster. It is also number of label
-    parser.add_argument('clusters', metavar='--clusters', type=int,
+    parser.add_argument('--clusters', type=int,
                         help='number of clusters', default=20, nargs='?')
     # get number of threshold
-    parser.add_argument('threshold', metavar='--threshold',
+    parser.add_argument('--threshold',
                         type=int, help='number threshold', default=10, nargs='?')
     # get criterion
-    parser.add_argument('criterion', metavar='--criterion', type=str,
+    parser.add_argument('--criterion',  type=str,
                         help='include "centroid", "similarity", "max_iters"', default="max_iters", nargs='?')
     args = parser.parse_args()
 
