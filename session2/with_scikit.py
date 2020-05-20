@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.svm import LinearSVC
+from sklearn.model_selection import train_test_split
 
 
 def load_data(pathFile, vocab_size):
@@ -36,10 +37,12 @@ def with_kmeans(pathFile, vocab_size):
 
 def with_linear_SVMS(pathFile, vocab_size):
     x, y = load_data(pathFile, vocab_size)
+    X_train, X_test, y_train, y_test = train_test_split(
+        x, y, test_size=0.33, random_state=42)
     classifier = LinearSVC(C=10.0, tol=0.001, verbose=True)
-    classifier.fit(x, y)
-    predict_y = classifier.predict(x)
-    acc = accuracy(predict_y, y)
+    classifier.fit(X_train, y_train)
+    predict_y = classifier.predict(X_test)
+    acc = accuracy(predict_y, y_test)
     return acc
 
 

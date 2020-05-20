@@ -69,13 +69,13 @@ def generateVocabulary(dataPath):
     wordsIdfs.sort(key=lambda wordIdf: wordIdf[0])
     wordsIdfs.sort(key=lambda wordIdf: -wordIdf[1])
     print(f'Vocabulary size: ', len(wordsIdfs))
-    with open('./20news-bydate/words_idfs.txt', 'w') as f:
+    with open('./data/20news-bydate/words_idfs.txt', 'w') as f:
         f.write('\n'.join([word + '<fff>' + str(idf)
                            for word, idf in wordsIdfs]))
 
 
 def get_tf_idf(data_path):
-    with open('./20news-bydate/words_idfs.txt') as f:
+    with open('./data/words_idfs.txt') as f:
         words_idfs = [(line.split('<fff>')[0], float(line.split('<fff>')[1]))
                       for line in f.readlines()]
 
@@ -112,16 +112,16 @@ def get_tf_idf(data_path):
         sparse_rep = ' '.join(words_tfidfs_normalized)
         data_tf_idf.append((label, doc_id, sparse_rep))
 
-    with open('./20news-bydate/data_tf_idf.txt', 'w') as f:
+    with open('./data/data_test_tf_idf.txt', 'w') as f:
         f.write('\n'.join([str(label) + '<fff>' + str(doc_id) + '<fff>' + sparse_rep
                            for label, doc_id, sparse_rep in data_tf_idf]))
 if __name__ == '__main__':
     # listGroupData()
-    # generateVocabulary('./20news-bydate/20news-full-processed.txt')
-    # get_tf_idf('./20news-bydate/20news-train-processed.txt')
-    text = "dung+ nguyen _ "
-    text = re.sub(r'[_+]', '', text)
-    print(text)
-    with open('./20news-bydate/20news-full-processed.txt') as f:
-        lines = f.readlines()
-    print(len(lines))
+    # generateVocabulary('./data/20news-bydate/data/20news-full-processed.txt')
+    get_tf_idf('./20news-test-processed.txt')
+    # text = "dung+ nguyen _ "
+    # text = re.sub(r'[_+]', '', text)
+    # print(text)
+    # with open('./20news-bydate/20news-full-processed.txt') as f:
+    #     lines = f.readlines()
+    # print(len(lines))

@@ -1,5 +1,9 @@
-# Training DSLab session 1:
+# Training DSLab 
+## Session 1:
 - Redge Regression
 - Tf_Idf
-# Training DSLab session 2:
+## Session 2:
 - Kmeas
+## Session 3:
+- Multi-layer Perceptron
+
