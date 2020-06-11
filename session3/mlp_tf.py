@@ -67,18 +67,17 @@ class DataReader(object):
         self.data = []
         self.label = []
         # creat vector with dim = vocabulary size
-        vector_line = [0.0 for _ in range(vocb_size)]
         # get label, data from file
         with open(path_file) as f:
             data = f.read().split("\n")
         for line in data:
-            feature = line.split("<fff>")
-            self.label.append(int(feature[0]))
-            for word in feature[2].split():
-                vector_line[int(word.split(':')[0])] = float(
-                    word.split(':')[1])
-            # vector line, value of index is tf-idf value
-            self.data.append(vector_line)
+        	vector_line = [0.0 for _ in range(vocb_size)]
+        	feature = line.split("<fff>")
+        	self.label.append(int(feature[0]))
+        	for word in feature[2].split():
+        		vector_line[int(word.split(':')[0])] = float(word.split(':')[1])
+        		# vector line, value of index is tf-idf value
+        	self.data.append(vector_line)
         # array data, label
         self.data = np.array(self.data)
         self.label = np.array(self.label)
@@ -110,11 +109,11 @@ def train(vocb_size, hidden_unit, number_classer, learn_rate, epoch, path_train,
     print("------load data train------")
     # load data train
     train_reader = DataReader(path_file=path_train,
-                              batch_size=50, vocb_size=vocb_size)
+                              batch_size=128, vocb_size=vocb_size)
     print("------load data test------")
     # load data test
     test_reader = DataReader(
-        path_file=path_test, batch_size=50, vocb_size=vocb_size)
+        path_file=path_test, batch_size=128, vocb_size=vocb_size)
     print("------load finish------")
     # create model MLP
     mlp = MLP(vocb_size=vocb_size, hidden_unit=hidden_unit,
@@ -149,17 +148,13 @@ def train(vocb_size, hidden_unit, number_classer, learn_rate, epoch, path_train,
             loss_of_epoch.append(loss_print)
             # get accuracy of epoch
             num_true_preds = 0
-            while True:
-                test_data, test_label = test_reader.next_batch()
-                test_plabels_eval = sess.run(predict_label,
+            test_plabels_eval = sess.run(predict_label,
                                              feed_dict={
-                                                 mlp.X: test_data,
-                                                 mlp.Y: test_label
+                                                 mlp.X: test_reader.data,
+                                                 mlp.Y: test_reader.label
                                              })
-                matches = np.equal(test_plabels_eval, test_label)
-                num_true_preds += np.sum(matches.astype(float))
-                if(test_reader.batch_id == 0):
-                    break
+            matches = np.equal(test_plabels_eval, test_reader.label)
+            num_true_preds = np.mean(matches)
             acc = num_true_preds / len(test_reader.data)
             accuracy_epoch.append(acc)
             print('------Accuracy ', acc)
@@ -220,18 +215,15 @@ def test_model(vocb_size, hidden_unit, number_classer, epoch, path_test):
             sess.run(assign_op)
         num_true_preds = 0
         # loop data test and predict
-        while True:
-            test_data, test_label = test_reader.next_batch()
-            test_plabels_eval = sess.run(predict_label,
+        test_data, test_label = test_reader.next_batch()
+        test_plabels_eval = sess.run(predict_label,
                                          feed_dict={
                                              mlp.X: test_data,
                                              mlp.Y: test_label
                                          })
-            matches = np.equal(test_plabels_eval, test_label)
+        matches = np.equal(test_plabels_eval, test_label)
             # num_true_preds  is number of predict label true
-            num_true_preds += np.sum(matches.astype(float))
-            if(test_reader.batch_id == 0):
-                break
+        num_true_preds += np.sum(matches.astype(float))
         print('------Accuracy ', num_true_preds / len(test_reader.data))
 
 
@@ -248,8 +240,8 @@ def logistic_regression():
 
 if __name__ == '__main__':
 
-    train(vocb_size=14140, hidden_unit=10, number_classer=20, learn_rate=0.001, epoch=5,
+    train(vocb_size=14140, hidden_unit=10, number_classer=20, learn_rate=0.0001, epoch=5,
           path_train="../session1/data/data_train_tf_idf.txt", path_test="../session1/data/data_train_tf_idf.txt")
-    test_model(vocb_size=14140, hidden_unit=100, number_classer=20,
-               epoch=10, path_test="../session1/data/data_train_tf_idf.txt")
-    logistic_regression()
+    # test_model(vocb_size=14140, hidden_unit=100, number_classer=20,
+    # epoch=10, path_test="../session1/data/data_train_tf_idf.txt")
+    #logistic_regression()
